@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple Login — Light Blue Theme</title>
+  <style>
+    :root{
+      --bg: #e9f6fb; 
+      --card: #ffffff;
+      --accent: #7fc8ff; 
+      --accent-2: #5aa9e6;
+      --text: #0b2940;
+      --muted: #4b6b7a;
+      --danger: #d9534f;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;background:linear-gradient(180deg,var(--bg),#f3fbff 60%);
+      color:var(--text);display:flex;align-items:center;justify-content:center;padding:24px;
+    }
+
+    .container{
+      width:100%;max-width:920px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;
+    }
+
+    .card{
+      background:var(--card);border-radius:14px;box-shadow:0 8px 30px rgba(11,41,64,0.08);padding:28px;
+    }
+
+    .brand{
+      display:flex;gap:12px;align-items:center;margin-bottom:18px;
+    }
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+
+    h1{margin:0 0 6px;font-size:20px}
+    p.lead{margin:0;color:var(--muted);font-size:14px}
+
+    form{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+    label{font-size:13px;color:var(--muted)}
+    input[type="text"], input[type="password"], select{
+      width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(11,41,64,0.08);font-size:15px;background:#fbfeff
+    }
+    input:focus, select:focus{outline:none;box-shadow:0 0 0 4px rgba(127,200,255,0.18);border-color:var(--accent-2)}
+
+    .actions{display:flex;gap:10px;margin-top:6px}
+    button{cursor:pointer;padding:10px 14px;border-radius:10px;border:0;font-weight:600}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;box-shadow:0 6px 18px rgba(90,169,230,0.25)}
+    .btn-ghost{background:transparent;border:1px solid rgba(11,41,64,0.06)}
+
+    .home{
+      display:none; 
+        }
+
+    .welcome{font-size:18px;margin:0 0 6px}
+    .meta{color:var(--muted);font-size:14px}
+
+   
+    @media (max-width:800px){
+      .container{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Login card -->
+    <section class="card" id="loginCard" aria-labelledby="loginHeading">
+      <div class="brand">
+        <div class="logo">LB</div>
+        <div>
+          <h1 id="loginHeading">Welcome</h1>
+          <p class="lead">Sign in to continue to the course dashboard</p>
+        </div>
+      </div>
+
+      <form id="loginForm" autocomplete="off">
+        <div>
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Your full name" required />
+        </div>
+
+        <div>
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" placeholder="Enter password" required />
+        </div>
+
+        <div>
+          <label for="course">Select course</label>
+          <select id="course" name="course" required>
+            <option value="">-- choose a course --</option>
+            <option value="web">Web Development</option>
+            <option value="python">Python Programming</option>
+            <option value="datasci">Data Science</option>
+            <option value="design">UI / UX Design</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Log in</button>
+          <button type="button" class="btn-ghost" id="demoBtn">Use demo data</button>
+        </div>
+
+        <p id="error" style="color:var(--danger);display:none;margin-top:8px;font-size:13px"></p>
+      </form>
+
+      
+    </section>
+
+    <!-- Home card -->
+    <section class="card home" id="homeCard" aria-live="polite">
+      <div class="brand">
+        <div class="logo">HB</div>
+        <div>
+          <h1 id="homeHeading">Home</h1>
+          <p class="lead">Your enrolled course and quick actions</p>
+        </div>
+      </div>
+
+      <div id="homeContent">
+        <p class="welcome" id="welcomeText">Hi, Student</p>
+        <p class="meta" id="courseText">Course: —</p>
+
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <button id="logoutBtn" class="btn-ghost">Log out</button>
+          <button id="changeBtn" class="btn-primary">Change course</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginCard = document.getElementById('loginCard');
+    const homeCard = document.getElementById('homeCard');
+    const welcomeText = document.getElementById('welcomeText');
+    const courseText = document.getElementById('courseText');
+    const errorP = document.getElementById('error');
+
+    document.getElementById('demoBtn').addEventListener('click', ()=>{
+      document.getElementById('name').value = 'Alex Johnson';
+      document.getElementById('password').value = 'demo1234';
+      document.getElementById('course').value = 'web';
+    });
+
+    loginForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      errorP.style.display = 'none';
+
+      const name = document.getElementById('name').value.trim();
+      const password = document.getElementById('password').value;
+      const course = document.getElementById('course').value;
+
+      // Simple front-end validation
+      if(!name){ showError('Please enter your name'); return; }
+      if(!password){ showError('Please enter a password'); return; }
+      if(!course){ showError('Please select a course'); return; }
+
+      // "Authenticate" (front-end demo only)
+      // For demonstration, accept any password with length >= 4
+      if(password.length < 4){ showError('Password must be at least 4 characters'); return; }
+
+      // Show home
+      welcomeText.textContent = `Hi, ${name}!`;
+      const coursePretty = document.querySelector(`#course option[value="${course}"]`).textContent;
+      courseText.textContent = `Course: ${coursePretty}`;
+      loginCard.style.display = 'none';
+      homeCard.style.display = 'block';
+    });
+
+    function showError(msg){ errorP.textContent = msg; errorP.style.display = 'block'; }
+
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      // clear fields but keep values if you want
+      document.getElementById('password').value = '';
+      loginCard.style.display = 'block';
+      homeCard.style.display = 'none';
+    });
+
+    document.getElementById('changeBtn').addEventListener('click', ()=>{
+      // bring back to the form for quick change
+      loginCard.style.display = 'block';
+      homeCard.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
